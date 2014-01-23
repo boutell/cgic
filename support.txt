@@ -1,0 +1,46 @@
+Support for CGIC
+----------------
+
+   ____
+  /    \
+ | STOP |
+  \____/
+  
+    Are you getting a "server error," indicating that your web server
+    "cannot allow POST to this URL," or a similar message? YOU MUST
+    CONFIGURE YOUR WEB SERVER TO ALLOW CGI PROGRAMS, AND YOU MUST
+    INSTALL CGI PROGRAMS IN THE LOCATION (OR WITH THE EXTENSION) THAT
+    YOUR WEB SERVER EXPECTS TO SEE. Please don't send me email about
+    this, unless you are purchasing commercial support. It is strictly 
+    between you and your web server's documentation, or between you and 
+    your ISP. If you wish to purchase commercial support, we will gladly 
+    attempt to help you resolve such problems, but the cooperation of 
+    your web server administrator will be necessary in most cases. Thanks!
+
+Free Support
+------------
+ 
+Anyone can mail questions about the gd and cgic libraries to 
+boutell@boutell.com. However, I receive a very large volume of email on 
+many subjects, and while I do my best to respond to all queries this can 
+take some time. Sometimes the response must take the form of an eventual 
+new release or an addition to a FAQ or other document, as opposed to an 
+detailed individual response.
+
+Hourly Support
+--------------
+
+Those requiring support in detail may arrange for direct support
+from the author, Thomas Boutell, at the rate of $50/hr, billed
+directly by credit card. Purchase orders are also accepted from
+Fortune 500 corporations and institutions in good standing.
+To make arrangements, contact boutell@boutell.com. Alternatively,
+use our free-form secure message page at:
+
+https://www.boutell.com/freeform/
+
+To avoid delay and/or confusion, be sure to specifically mention that 
+you wish to purchase CGIC support at the hourly rate above.
+
+-Thomas Boutell, boutell@boutell.com
+
