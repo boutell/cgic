@@ -235,6 +235,7 @@ int main(int argc, char *argv[]) {
 				fprintf(dout, "PostFormInput failed\n");
 				CGICDEBUGEND	
 #endif /* CGICDEBUG */
+				cgiHeaderStatus(500, "Error reading form data");
 				cgiFreeResources();
 				return -1;
 			}	
@@ -255,6 +256,7 @@ int main(int argc, char *argv[]) {
 				fprintf(dout, "PostMultipartInput failed\n");
 				CGICDEBUGEND	
 #endif /* CGICDEBUG */
+				cgiHeaderStatus(500, "Error reading form data");
 				cgiFreeResources();
 				return -1;
 			}	
@@ -274,6 +276,7 @@ int main(int argc, char *argv[]) {
 			fprintf(dout, "GetFormInput failed\n");
 			CGICDEBUGEND	
 #endif /* CGICDEBUG */
+			cgiHeaderStatus(500, "Error reading form data");
 			cgiFreeResources();
 			return -1;
 		} else {	
@@ -342,6 +345,11 @@ int mpRead(mpStreamPtr mpp, char *buffer, int len)
 {
 	int ilen = len;
 	int got = 0;
+	/* Refuse to read past the declared length in order to
+		avoid deadlock */
+	if (len > (cgiContentLength - mpp->offset)) {
+		len = cgiContentLength - mpp->offset;
+	}
 	while (len) {
 		if (mpp->readPos != mpp->writePos) {
 			*buffer++ = mpp->putback[mpp->readPos++];
@@ -351,11 +359,6 @@ int mpRead(mpStreamPtr mpp, char *buffer, int len)
 		} else {
 			break;
 		}	
-	}
-	/* Refuse to read past the declared length in order to
-		avoid deadlock */
-	if (len > (cgiContentLength - mpp->offset)) {
-		len = cgiContentLength - mpp->offset;
 	}
 	if (len) {
 		int fgot = fread(buffer, 1, len, cgiIn);
@@ -370,6 +373,7 @@ int mpRead(mpStreamPtr mpp, char *buffer, int len)
 			return fgot;
 		}
 	} else if (got) {
+		mpp->offset += got;
 		return got;
 	} else if (ilen) {	
 		return EOF;
@@ -508,6 +512,11 @@ static cgiParseResultType cgiParsePostMultipartInput() {
 		}
 		if (!cgiStrEqNc(fvalue, "form-data")) {
 			/* Not form data */	
+			result = afterNextBoundary(mpp, 0, 0, 0, 0);
+			if (result != cgiParseSuccess) {
+				/* Lack of a boundary here is an error. */
+				return result;
+			}
 			continue;
 		}
 		/* Body is everything from here until the next 
@@ -779,7 +788,7 @@ outOfMemory:
 		if (out) {
 			free(out);
 		}
-		*outP = '\0';	
+		*outP = 0;	
 	}
 error:
 	if (bodyLengthP) {
@@ -1716,7 +1725,7 @@ cgiFormResultType cgiCookieString(
 			genuine security concern. Thanks to Nicolas 
 			Tomadakis. */
 		while (*p == *n) {
-			if ((p == '\0') && (n == '\0')) {
+			if ((*p == '\0') && (*n == '\0')) {
 				/* Malformed cookie header from client */
 				return cgiFormNotFound;
 			}
@@ -1768,6 +1777,7 @@ cgiFormResultType cgiCookieString(
 	}
 	/* 2.01: actually the above loop never terminates except
 		with a return, but do this to placate gcc */
+	/* Actually, it can, so this is real. */
 	if (space) {
 		*value = '\0';
 	}
@@ -1798,7 +1808,7 @@ void cgiHeaderCookieSetInteger(char *name, int value, int secondsToLive,
 	cgiHeaderCookieSetString(name, svalue, secondsToLive, path, domain);
 }
 
-char *days[] = {
+static char *days[] = {
 	"Sun",
 	"Mon",
 	"Tue",
@@ -1808,7 +1818,7 @@ char *days[] = {
 	"Sat"
 };
 
-char *months[] = {
+static char *months[] = {
 	"Jan",
 	"Feb",
 	"Mar",
@@ -2157,6 +2167,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
 			out = fopen(tfileName, "w+b");
 			if (!out) {
 				result = cgiEnvironmentIO;
+				unlink(tfileName);
 				goto error;
 			}
 			while (len > 0) {		
@@ -2197,6 +2208,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
 				result = cgiEnvironmentMemory;
 				goto error;
 			}
+			e->tfileName[0] = '\0';
 		}	
 		e->next = 0;
 		if (p) {
