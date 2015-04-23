@@ -205,20 +205,20 @@ extern cgiFormResultType cgiFormEntries(
 /* Output string with the <, &, and > characters HTML-escaped. 
 	's' is null-terminated. Returns cgiFormIO in the event
 	of error, cgiFormSuccess otherwise. */
-cgiFormResultType cgiHtmlEscape(char *s);
+cgiFormResultType cgiHtmlEscape(const char *s);
 
 /* Output data with the <, &, and > characters HTML-escaped. 
 	'data' is not null-terminated; 'len' is the number of
 	bytes in 'data'. Returns cgiFormIO in the event
 	of error, cgiFormSuccess otherwise. */
-cgiFormResultType cgiHtmlEscapeData(char *data, int len);
+cgiFormResultType cgiHtmlEscapeData(const char *data, int len);
 
 /* Output string with the " character HTML-escaped, and no
 	other characters escaped. This is useful when outputting
 	the contents of a tag attribute such as 'href' or 'src'.
 	's' is null-terminated. Returns cgiFormIO in the event
 	of error, cgiFormSuccess otherwise. */
-cgiFormResultType cgiValueEscape(char *s);
+cgiFormResultType cgiValueEscape(const char *s);
 
 /* Output data with the " character HTML-escaped, and no
 	other characters escaped. This is useful when outputting
@@ -226,7 +226,7 @@ cgiFormResultType cgiValueEscape(char *s);
 	'data' is not null-terminated; 'len' is the number of
 	bytes in 'data'. Returns cgiFormIO in the event
 	of error, cgiFormSuccess otherwise. */
-cgiFormResultType cgiValueEscapeData(char *data, int len);
+cgiFormResultType cgiValueEscapeData(const char *data, int len);
 
 #endif /* CGI_C */
 

@@ -2475,7 +2475,7 @@ skipSecondValue2:
 		} \
 	} 
 
-cgiFormResultType cgiHtmlEscapeData(char *data, int len)
+cgiFormResultType cgiHtmlEscapeData(const char *data, int len)
 {
 	while (len--) {
 		if (*data == '<') {
@@ -2502,7 +2502,7 @@ cgiFormResultType cgiHtmlEscapeData(char *data, int len)
 	return cgiFormSuccess;
 }
 
-cgiFormResultType cgiHtmlEscape(char *s)
+cgiFormResultType cgiHtmlEscape(const char *s)
 {
 	return cgiHtmlEscapeData(s, (int) strlen(s));
 }
@@ -2513,7 +2513,7 @@ cgiFormResultType cgiHtmlEscape(char *s)
 	'data' is not null-terminated; 'len' is the number of
 	bytes in 'data'. Returns cgiFormIO in the event
 	of error, cgiFormSuccess otherwise. */
-cgiFormResultType cgiValueEscapeData(char *data, int len)
+cgiFormResultType cgiValueEscapeData(const char *data, int len)
 {
 	while (len--) {
 		if (*data == '\"') {
@@ -2530,7 +2530,7 @@ cgiFormResultType cgiValueEscapeData(char *data, int len)
 	return cgiFormSuccess;
 }
 
-cgiFormResultType cgiValueEscape(char *s)
+cgiFormResultType cgiValueEscape(const char *s)
 {
 	return cgiValueEscapeData(s, (int) strlen(s));
 }
