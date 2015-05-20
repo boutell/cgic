@@ -2441,7 +2441,7 @@ skipSecondValue:
 	e = cgiFormEntryFirst;
 	i = 0;
 	while (e) {
-		int space;
+		size_t space;
 		/* Don't return a field name more than once if
 			multiple values happen to be present for it */
 		pe = cgiFormEntryFirst;
@@ -2451,7 +2451,7 @@ skipSecondValue:
 			}
 			pe = pe->next;					
 		}		
-		space = (int) strlen(e->attr) + 1;
+		space = strlen(e->attr) + 1;
 		stringArray[i] = (char *) malloc(space);
 		if (stringArray[i] == 0) {
 			/* Memory problems */
