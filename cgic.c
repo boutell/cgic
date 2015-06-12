@@ -905,7 +905,9 @@ static void decomposeValue(char *value,
 			}	
 		}	
 		if (argValueSpace) {
-			argValue[argValueLen] = '\0';
+			if (argValue) {
+				argValue[argValueLen] = '\0';
+			}
 		}
 	}	 	
 }
