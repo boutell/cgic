@@ -90,7 +90,7 @@ typedef enum {
 	VALUES. Make local copies if modifications are desired. */
 
 typedef struct cgiFormEntryStruct {
-        char *attr;
+	char *attr;
 	/* value is populated for regular form fields only.
 		For file uploads, it points to an empty string, and file
 		upload data should be read from the file tfileName. */ 
@@ -100,7 +100,7 @@ typedef struct cgiFormEntryStruct {
 	/* Valid for both files and regular fields; does not include
 		terminating null of regular fields. */
 	int valueLength;
-	char *fileName;	
+	char *fileName;
 	char *contentType;
 	/* Temporary file name for working storage of file uploads. */
 	char *tfileName;
@@ -118,6 +118,10 @@ static void cgiSetupConstants();
 static void cgiFreeResources();
 static int cgiStrEqNc(char *s1, char *s2);
 static int cgiStrBeginsNc(char *s1, char *s2);
+
+#ifdef UNIT_TEST
+static int unitTest();
+#endif
 
 int main(int argc, char *argv[]) {
 	int result;
@@ -287,9 +291,14 @@ int main(int argc, char *argv[]) {
 #endif /* CGICDEBUG */
 		}
 	}
-	result = cgiMain();
+#ifdef UNIT_TEST
+	unitTest();
 	cgiFreeResources();
+	return 0;
+#else
+	result = cgiMain();
 	return result;
+#endif
 }
 
 static void cgiGetenv(char **s, char *var){
@@ -996,22 +1005,25 @@ static cgiParseResultType cgiParseFormInput(char *data, int length) {
 	cgiFormEntry *n;
 	cgiFormEntry *l = 0;
 	while (pos != length) {
-		int foundEq = 0;
 		int foundAmp = 0;
 		int start = pos;
 		int len = 0;
 		char *attr;
 		char *value;
 		while (pos != length) {
+			if (data[pos] == '&') {
+				/* Tolerate attr name without a value. This will fall through
+					and give us an empty value */
+				break;
+			}
 			if (data[pos] == '=') {
-				foundEq = 1;
 				pos++;
 				break;
 			}
 			pos++;
 			len++;
 		}
-		if (!foundEq) {
+		if (!len) {
 			break;
 		}
 		if (cgiUnescapeChars(&attr, data+start, len)
@@ -2538,3 +2550,46 @@ cgiFormResultType cgiValueEscape(const char *s)
 }
 
 
+#ifdef UNIT_TEST
+
+static void unitTestAssert(const int value, const char *message);
+
+static int unitTest() {
+	char *input = "one=1&two=2&empty1&four=4&empty2";
+	cgiFormEntry *e;
+	cgiParseResultType result = cgiParseFormInput(input, strlen(input));
+	unitTestAssert(result == cgiParseSuccess, "cgiParseFormInput did not return cgiParseSuccess");
+	e = cgiFormEntryFirst;
+	unitTestAssert(!!e, "first entry missing");
+	unitTestAssert(!strcmp(e->attr, "one"), "first entry name is not one");
+	unitTestAssert(!strcmp(e->value, "1"), "first entry value is not 1");
+	e = e->next;
+	unitTestAssert(!!e, "Test failed: second entry missing");
+	unitTestAssert(!strcmp(e->attr, "two"), "second entry name is not two");
+	unitTestAssert(!strcmp(e->value, "2"), "second entry value is not 2");
+	e = e->next;
+	unitTestAssert(!!e, "Test failed: third entry missing");
+	unitTestAssert(!strcmp(e->attr, "empty1"), "third entry name is not empty1");
+	unitTestAssert(!strcmp(e->value, ""), "third entry value is not empty string");
+	e = e->next;
+	unitTestAssert(!!e, "Test failed: fourth entry missing");
+	unitTestAssert(!strcmp(e->attr, "four"), "fourth entry name is not four");
+	unitTestAssert(!strcmp(e->value, "4"), "fourth entry value is not 4");
+	e = e->next;
+	unitTestAssert(!!e, "Test failed: fifth entry missing");
+	unitTestAssert(!strcmp(e->attr, "empty2"), "fifth entry name is not empty2");
+	unitTestAssert(!strcmp(e->value, ""), "fifth entry value is not empty string");
+	unitTestAssert(!e->next, "unexpected entry at end of list");
+	return 0;
+}
+
+static void unitTestAssert(const int value, const char *message)
+{
+	if (value) {
+		return;
+	}
+	fprintf(stderr, "Test failed: %s\n", message);
+	exit(1);
+}
+
+#endif

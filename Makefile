@@ -27,3 +27,6 @@ capture: capture.o libcgic.a
 clean:
 	rm -f *.o *.a cgictest.cgi capture
 
+test:
+	gcc -D UNIT_TEST=1 cgic.c -o cgicunittest
+	./cgicunittest
