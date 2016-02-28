@@ -25,7 +25,7 @@ capture: capture.o libcgic.a
 	gcc capture.o -o capture ${LIBS}
 
 clean:
-	rm -f *.o *.a cgictest.cgi capture
+	rm -f *.o *.a cgictest.cgi capture cgicunittest
 
 test:
 	gcc -D UNIT_TEST=1 cgic.c -o cgicunittest
