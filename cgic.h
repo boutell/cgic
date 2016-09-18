@@ -6,6 +6,11 @@
 #ifndef CGI_C
 #define CGI_C 1
 
+/* Ensure proper linkage to c++ programs. */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Bring in standard I/O since some of the functions refer to
 	types defined by it, such as FILE *. */
 
@@ -227,6 +232,10 @@ cgiFormResultType cgiValueEscape(const char *s);
 	bytes in 'data'. Returns cgiFormIO in the event
 	of error, cgiFormSuccess otherwise. */
 cgiFormResultType cgiValueEscapeData(const char *data, int len);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* CGI_C */
 
