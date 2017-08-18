@@ -102,8 +102,8 @@ typedef struct cgiFormEntryStruct {
 	int valueLength;
 	char *fileName;
 	char *contentType;
-	/* Temporary file name for working storage of file uploads. */
-	char *tfileName;
+	/* Temporary file descriptor for working storage of file uploads. */
+	FILE *tFile;
         struct cgiFormEntryStruct *next;
 } cgiFormEntry;
 
@@ -436,13 +436,7 @@ static void decomposeValue(char *value,
 	char **argValues,
 	int argValueSpace);
 
-/* tfileName must be 1024 bytes to ensure adequacy on
-	win32 (1024 exceeds the maximum path length and
-	certainly exceeds observed behavior of _tmpnam).
-	May as well also be 1024 bytes on Unix, although actual
-	length is strlen(cgiTempDir) + a short unique pattern. */
-	
-static cgiParseResultType getTempFileName(char *tfileName);
+static cgiParseResultType getTempFileName(FILE **tFile);
 
 static cgiParseResultType cgiParsePostMultipartInput() {
 	cgiParseResultType result;
@@ -450,7 +444,6 @@ static cgiParseResultType cgiParsePostMultipartInput() {
 	int got;
 	FILE *outf = 0;
 	char *out = 0;
-	char tfileName[1024];
 	mpStream mp;
 	mpStreamPtr mpp = &mp;
 	memset(&mp, 0, sizeof(mp));
@@ -535,20 +528,17 @@ static cgiParseResultType cgiParsePostMultipartInput() {
 			Otherwise, store to a memory buffer (it is
 			presumably a regular form field). */
 		if (strlen(ffileName)) {
-			if (getTempFileName(tfileName) != cgiParseSuccess) {
+			if (getTempFileName(&outf) != cgiParseSuccess) {
 				return cgiParseIO;
 			}	
-			outf = fopen(tfileName, "w+b");
 		} else {
 			outf = 0;
-			tfileName[0] = '\0';
 		}	
 		result = afterNextBoundary(mpp, outf, &out, &bodyLength, 0);
 		if (result != cgiParseSuccess) {
 			/* Lack of a boundary here is an error. */
 			if (outf) {
 				fclose(outf);
-				unlink(tfileName);
 			}
 			if (out) {
 				free(out);
@@ -577,7 +567,6 @@ static cgiParseResultType cgiParsePostMultipartInput() {
 				goto outOfMemory;
 			}
 			n->value[0] = '\0';
-			fclose(outf);
 		}
 		n->valueLength = bodyLength;
 		n->next = 0;
@@ -596,11 +585,12 @@ static cgiParseResultType cgiParsePostMultipartInput() {
 			goto outOfMemory;
 		}
 		strcpy(n->contentType, fcontentType);
-		n->tfileName = (char *) malloc(strlen(tfileName) + 1);
-		if (!n->tfileName) {
-			goto outOfMemory;
+	
+		if(outf)
+		{
+			n->tFile = fdopen (dup (fileno (outf)), "w+b");
+			fclose(outf);
 		}
-		strcpy(n->tfileName, tfileName);
 
 		l = n;			
 	}	
@@ -616,8 +606,8 @@ outOfMemory:
 		if (n->fileName) {
 			free(n->fileName);
 		}
-		if (n->tfileName) {
-			free(n->tfileName);
+		if (n->tFile) {
+			fclose(n->tFile);
 		}
 		if (n->contentType) {
 			free(n->contentType);
@@ -629,13 +619,20 @@ outOfMemory:
 	}
 	if (outf) {
 		fclose(outf);
-		unlink(tfileName);
 	}
-	return cgiParseMemory;
+
+return cgiParseMemory;
 }
 
-static cgiParseResultType getTempFileName(char *tfileName)
+static cgiParseResultType getTempFileName(FILE **tFile)
 {
+	/* tfileName must be 1024 bytes to ensure adequacy on
+		win32 (1024 exceeds the maximum path length and
+		certainly exceeds observed behavior of _tmpnam).
+		May as well also be 1024 bytes on Unix, although actual
+		length is strlen(cgiTempDir) + a short unique pattern. */
+	char tfileName[1024];
+	
 #ifndef WIN32
 	/* Unix. Use the robust 'mkstemp' function to create
 		a temporary file that is truly unique, with
@@ -663,6 +660,8 @@ static cgiParseResultType getTempFileName(char *tfileName)
 		return cgiParseIO;
 	}
 #endif
+	*tFile = fopen(tfileName, "w+b");
+	unlink(tfileName);
 	return cgiParseSuccess;
 }
 
@@ -1075,16 +1074,6 @@ static cgiParseResultType cgiParseFormInput(char *data, int length) {
 			return cgiParseMemory;
 		}	
 		n->contentType[0] = '\0';
-		n->tfileName = (char *) malloc(1);
-		if (!n->tfileName) {
-			free(attr);
-			free(value);
-			free(n->fileName);
-			free(n->contentType);
-			free(n);
-			return cgiParseMemory;
-		}	
-		n->tfileName[0] = '\0';
 		n->next = 0;
 		if (!l) {
 			cgiFormEntryFirst = n;
@@ -1178,10 +1167,9 @@ static void cgiFreeResources() {
 		free(c->value);
 		free(c->fileName);
 		free(c->contentType);
-		if (strlen(c->tfileName)) {
-			unlink(c->tfileName);
+		if (c->tFile) {
+			fclose(c->tFile);
 		}
-		free(c->tfileName);
 		free(c);
 		c = n;
 	}
@@ -1299,7 +1287,7 @@ cgiFormResultType cgiFormFileSize(
 			*sizeP = 0;
 		}
 		return cgiFormNotFound;
-	} else if (!strlen(e->tfileName)) {
+	} else if (!e->tFile) {
 		if (sizeP) {
 			*sizeP = 0;
 		}
@@ -1326,7 +1314,7 @@ cgiFormResultType cgiFormFileOpen(
 		*cfpp = 0;
 		return cgiFormNotFound;
 	}
-	if (!strlen(e->tfileName)) {
+	if (!e->tFile) {
 		*cfpp = 0;
 		return cgiFormNotAFile;
 	}
@@ -1335,7 +1323,8 @@ cgiFormResultType cgiFormFileOpen(
 		*cfpp = 0;
 		return cgiFormMemory;
 	}
-	cfp->in = fopen(e->tfileName, "rb");
+	cfp->in = fdopen(dup(fileno(e->tFile)), "rb");
+	rewind(cfp->in);
 	if (!cfp->in) {
 		free(cfp);
 		return cgiFormIO;
@@ -2168,20 +2157,13 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
 		}
 		if (fileFlag) {
 			char buffer[1024];
-			FILE *out;
-			char tfileName[1024];
+			FILE *out = NULL;
 			int got;
 			int len = e->valueLength;
-			if (getTempFileName(tfileName)
-				!= cgiParseSuccess)
+			if (getTempFileName(&out)
+				!= cgiParseSuccess || !out)
 			{
 				result = cgiEnvironmentIO;
-				goto error;
-			}
-			out = fopen(tfileName, "w+b");
-			if (!out) {
-				result = cgiEnvironmentIO;
-				unlink(tfileName);
 				goto error;
 			}
 			while (len > 0) {		
@@ -2196,33 +2178,19 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
 				if (got <= 0) {
 					result = cgiEnvironmentIO;
 					fclose(out);
-					unlink(tfileName);
 					goto error;
 				}
 				if (((int) fwrite(buffer, 1, got, out)) != got) {
 					result = cgiEnvironmentIO;
 					fclose(out);
-					unlink(tfileName);
 					goto error;
 				}
 				len -= got;
 			}
 			/* cgic 2.05: should be fclose not rewind */
-			fclose(out);
-			e->tfileName = (char *) malloc((int) strlen(tfileName) + 1);
-			if (!e->tfileName) {
-				result = cgiEnvironmentMemory;
-				unlink(tfileName);
-				goto error;
-			}
-			strcpy(e->tfileName, tfileName);
+			e->tFile = out;
 		} else {
-			e->tfileName = (char *) malloc(1);
-			if (!e->tfileName) {
-				result = cgiEnvironmentMemory;
-				goto error;
-			}
-			e->tfileName[0] = '\0';
+			e->tFile = NULL;
 		}	
 		e->next = 0;
 		if (p) {
@@ -2253,8 +2221,8 @@ error:
 		if (e->contentType) {
 			free(e->contentType);
 		}
-		if (e->tfileName) {
-			free(e->tfileName);
+		if (e->tFile) {
+			fclose(e->tFile);
 		}
 		free(e);
 	}
