@@ -4,7 +4,7 @@
 /* Used only in Unix environments, in conjunction with mkstemp(). 
 	Elsewhere (Windows), temporary files go where the tmpnam() 
 	function suggests. If this behavior does not work for you, 
-	modify the getTempFileName() function to suit your needs. */
+	modify the getTempFile() function to suit your needs. */
 
 #define cgicTempDir "/tmp"
 
@@ -436,7 +436,7 @@ static void decomposeValue(char *value,
 	char **argValues,
 	int argValueSpace);
 
-static cgiParseResultType getTempFileName(FILE **tFile);
+static cgiParseResultType getTempFile(FILE **tFile);
 
 static cgiParseResultType cgiParsePostMultipartInput() {
 	cgiParseResultType result;
@@ -528,7 +528,7 @@ static cgiParseResultType cgiParsePostMultipartInput() {
 			Otherwise, store to a memory buffer (it is
 			presumably a regular form field). */
 		if (strlen(ffileName)) {
-			if (getTempFileName(&outf) != cgiParseSuccess) {
+			if (getTempFile(&outf) != cgiParseSuccess) {
 				return cgiParseIO;
 			}	
 		} else {
@@ -624,7 +624,7 @@ outOfMemory:
 return cgiParseMemory;
 }
 
-static cgiParseResultType getTempFileName(FILE **tFile)
+static cgiParseResultType getTempFile(FILE **tFile)
 {
 	/* tfileName must be 1024 bytes to ensure adequacy on
 		win32 (1024 exceeds the maximum path length and
@@ -2160,7 +2160,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
 			FILE *out = NULL;
 			int got;
 			int len = e->valueLength;
-			if (getTempFileName(&out)
+			if (getTempFile(&out)
 				!= cgiParseSuccess || !out)
 			{
 				result = cgiEnvironmentIO;
