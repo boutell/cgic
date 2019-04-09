@@ -1867,7 +1867,7 @@ void cgiHeaderCookieSetString(char *name, char *value, int secondsToLive,
 	then = now + secondsToLive;
 	gt = gmtime(&then);
 	fprintf(cgiOut, 
-		"Set-Cookie: %s=%s; domain=%s; expires=%s, %02d-%s-%04d %02d:%02d:%02d GMT; path=%s\r\n",
+		"Set-Cookie: %s=%s; domain=%s; expires=%s, %02d-%s-%04d %02d:%02d:%02d GMT; path=%s; HttpOnly\r\n",
 		name, value, domain, 
 		days[gt->tm_wday],
 		gt->tm_mday,
