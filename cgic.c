@@ -1847,8 +1847,8 @@ static char *months[] = {
 	"Dec"
 };
 
-void cgiHeaderCookieSetString(char *name, char *value, int secondsToLive,
-	char *path, char *domain)
+void cgiHeaderCookieSetStringOptions(char *name, char *value, int secondsToLive,
+	char *path, char *domain, int options)
 {
 	/* cgic 2.02: simpler and more widely compatible implementation.
 		Thanks to Chunfu Lai. 
@@ -1867,7 +1867,7 @@ void cgiHeaderCookieSetString(char *name, char *value, int secondsToLive,
 	then = now + secondsToLive;
 	gt = gmtime(&then);
 	fprintf(cgiOut, 
-		"Set-Cookie: %s=%s; domain=%s; expires=%s, %02d-%s-%04d %02d:%02d:%02d GMT; path=%s; HttpOnly\r\n",
+		"Set-Cookie: %s=%s; domain=%s; expires=%s, %02d-%s-%04d %02d:%02d:%02d GMT; path=%s%s%s%s\r\n",
 		name, value, domain, 
 		days[gt->tm_wday],
 		gt->tm_mday,
@@ -1876,7 +1876,10 @@ void cgiHeaderCookieSetString(char *name, char *value, int secondsToLive,
 		gt->tm_hour,
 		gt->tm_min,
 		gt->tm_sec,
-		path);
+		path,
+		((options & cgiCookieSecure) ? "; Secure" : ""),
+		((options & cgiCookieHttpOnly) ? "; HttpOnly" : ""),
+		((options & cgiCookieSameSiteStrict) ? "; SameSite=Strict" : ""));
 }
 
 void cgiHeaderLocation(char *redirectUrl) {

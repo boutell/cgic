@@ -181,11 +181,19 @@ extern cgiFormResultType cgiCookieInteger(
 cgiFormResultType cgiCookies(
 	char ***ptrToStringArray);
 
+typedef enum {
+	cgiCookieSecure         = 1,
+	cgiCookieHttpOnly       = 2,
+	cgiCookieSameSiteStrict = 4
+} cgiCookieOption;
+
 /* path can be null or empty in which case a path of / (entire site) is set. 
 	domain can be a single web site; if it is an entire domain, such as
 	'boutell.com', it should begin with a dot: '.boutell.com' */
-extern void cgiHeaderCookieSetString(char *name, char *value, 
-	int secondsToLive, char *path, char *domain);
+#define cgiHeaderCookieSetString(name, value, secondsToLive, path, domain) \
+	cgiHeaderCookieSetStringOptions((name), (value), (secondsToLive), (path), (domain), 0)
+extern void cgiHeaderCookieSetStringOptions(char *name, char *value, 
+	int secondsToLive, char *path, char *domain, int options);
 extern void cgiHeaderCookieSetInteger(char *name, int value,
 	int secondsToLive, char *path, char *domain);
 extern void cgiHeaderLocation(char *redirectUrl);
