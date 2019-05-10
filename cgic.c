@@ -7,6 +7,7 @@
 	modify the getTempFile() function to suit your needs. */
 
 #define cgicTempDir "/tmp"
+#define cgicMaxTempSize 1073741824
 
 #if CGICDEBUG
 #define CGICDEBUGSTART \
@@ -758,7 +759,10 @@ cgiParseResultType afterNextBoundary(mpStreamPtr mpp, FILE *outf, char **outP,
 			/* Not presently in the middle of a boundary
 				match; just emit the character. */
 			BAPPEND(d[0]);
-		}	
+		}
+		if(outLen > cgicMaxTempSize) {
+			goto outOfMemory;
+		}
 	}
 	/* Read trailing newline or -- EOF marker. A literal EOF here
 		would be an error in the input stream. */
