@@ -183,7 +183,7 @@ cgiFormResultType cgiCookies(
 
 /* path can be null or empty in which case a path of / (entire site) is set. 
 	domain can be a single web site; if it is an entire domain, such as
-	'boutell.com', it should begin with a dot: '.boutell.com' */
+	'boutell.dev', it should begin with a dot: '.boutell.dev' */
 extern void cgiHeaderCookieSetString(char *name, char *value, 
 	int secondsToLive, char *path, char *domain);
 extern void cgiHeaderCookieSetInteger(char *name, int value,

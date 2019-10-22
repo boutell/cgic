@@ -192,7 +192,7 @@ This bug has been corrected.
 <li>
 Many small changes have been made to increase compatibility.
 cgic now compiles with no warnings under the compilers
-available at boutell.com.
+available at boutell.dev.
 </ul>
 <h3><a name="whatsnew101">What's new in version 1.01?</a></h3>
 Version 1.01 adds no major functionality but corrects 
@@ -302,10 +302,10 @@ This command also produces the subdirectory 'cgic207', which will contain
 the complete cgic distribution, including a copy of this 
 documentation in the file cgic.html.
 <p>
-cgic is available via the web from www.boutell.com:
+cgic is available via the web from www.boutell.dev:
 <ul>
-<li><a href="http://www.boutell.com/cgic/cgic207.tar.gz">Obtain cgic: gzipped tar file</a>
-<li><a href="http://www.boutell.com/cgic/cgic207.zip">Obtain cgic: .ZIP file</a>
+<li><a href="http://www.boutell.dev/cgic/cgic207.tar.gz">Obtain cgic: gzipped tar file</a>
+<li><a href="http://www.boutell.dev/cgic/cgic207.zip">Obtain cgic: .ZIP file</a>
 </ul>
 <h3><a name="build">Building cgic: a sample application</a></h3>
 The sample application 'cgictest.c' is provided as part of the
@@ -475,7 +475,7 @@ In this case the cookie is relevant only to the CGI program itself, so
 <code><a href="#cgiScriptName">cgiScriptName</a></code> (the URL of the CGI program, not including the
 domain name) is sent. Similarly, a cookie can be considered relevant
 to a single web site or to an entire domain, such as 
-<code>www.boutell.com</code> or the entire <code>.boutell.com</code>
+<code>www.boutell.dev</code> or the entire <code>.boutell.dev</code>
 domain. In this case, the current site on which the program is running
 is the only relevant site, so <code><a href="#cgiServerName">cgiServerName</a></code> is used
 as the domain.
@@ -1176,7 +1176,7 @@ variable containing the name of the browser software is
 in the variable <a href="#cgiReferrer">cgiReferrer</a>.
 <h3><a name="images">How can I generate images from my cgic application?</a></h3>
 cgic can be used in conjunction with the
-<a href="http://www.boutell.com/gd/">gd graphics library</a>, which
+<a href="https://libgd.github.io/">gd graphics library</a>, which
 can produce GIF images on the fly.
 <p>
 The following short sample program hints at the possibilities:
@@ -1669,7 +1669,7 @@ set this argument to <code>/</code>. The final argument is the
 web site name or entire domain for which this cookie should be
 submitted; if you choose to have the cookie sent back for an
 entire domain, this argument must begin with a dot, such as
-<code>.boutell.com</code>. The cgic variables <a name="#cgiScriptName</a>
+<code>.boutell.dev</code>. The cgic variables <a name="#cgiScriptName</a>
 and <a name="#cgiServerName">cgiServerName</a> are convenient
 values for the fourth and fifth arguments.
 See also <a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>,
