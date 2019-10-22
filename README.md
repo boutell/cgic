@@ -1,13 +1,5 @@
-<html>
-<head>
-<title>cgic: an ANSI C library for CGI Programming</title>
-</head>
-<body>
 <h1>cgic 2.07: an ANSI C library for CGI Programming</h1>
-<h2>By <a href="http://www.boutell.com/boutell/">Thomas Boutell</a></h2>
-<em><a href="http://www.boutell.com/cgic/">
-The LATEST documentation is available here. Check often
-for new releases.</a></em>
+<h2>By <a href="http://boutell.dev">Thomas Boutell</a></h2>
 <blockquote>
 <strong>IMPORTANT NOTICES:</strong>
 <p>
@@ -2092,5 +2084,3 @@ produced by a pre-2.0 version of CGIC was made.
 <a href="#cgiStringArrayFree">cgiStringArrayFree()</a> |
 <a href="#cgiUserAgent">cgiUserAgent</a> |
 <a href="#cgiWriteEnvironment">cgiWriteEnvironment()</a>
-</body>
-</html>
