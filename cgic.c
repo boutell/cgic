@@ -1819,7 +1819,7 @@ void cgiHeaderCookieSetInteger(char *name, int value, int secondsToLive,
 {
 	char svalue[256];
 	sprintf(svalue, "%d", value);
-	cgiHeaderCookieSetString(name, svalue, secondsToLive, path, domain);
+	cgiHeaderCookieSet(name, svalue, secondsToLive, path, domain, 0);
 }
 
 static char *days[] = {
@@ -1847,7 +1847,7 @@ static char *months[] = {
 	"Dec"
 };
 
-void cgiHeaderCookieSetStringOptions(char *name, char *value, int secondsToLive,
+void cgiHeaderCookieSet(char *name, char *value, int secondsToLive,
 	char *path, char *domain, int options)
 {
 	/* cgic 2.02: simpler and more widely compatible implementation.
@@ -1880,6 +1880,12 @@ void cgiHeaderCookieSetStringOptions(char *name, char *value, int secondsToLive,
 		((options & cgiCookieSecure) ? "; Secure" : ""),
 		((options & cgiCookieHttpOnly) ? "; HttpOnly" : ""),
 		((options & cgiCookieSameSiteStrict) ? "; SameSite=Strict" : ""));
+}
+
+void cgiHeaderCookieSetString(char *name, char *value, int secondsToLive,
+	char *path, char *domain)
+{
+	cgiHeaderCookieSet(name, value, secondsToLive, path, domain, 0);
 }
 
 void cgiHeaderLocation(char *redirectUrl) {

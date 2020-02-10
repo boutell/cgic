@@ -190,10 +190,10 @@ typedef enum {
 /* path can be null or empty in which case a path of / (entire site) is set. 
 	domain can be a single web site; if it is an entire domain, such as
 	'boutell.com', it should begin with a dot: '.boutell.com' */
-#define cgiHeaderCookieSetString(name, value, secondsToLive, path, domain) \
-	cgiHeaderCookieSetStringOptions((name), (value), (secondsToLive), (path), (domain), 0)
-extern void cgiHeaderCookieSetStringOptions(char *name, char *value, 
+extern void cgiHeaderCookieSet(char *name, char *value,
 	int secondsToLive, char *path, char *domain, int options);
+extern void cgiHeaderCookieSetString(char *name, char *value,
+	int secondsToLive, char *path, char *domain);
 extern void cgiHeaderCookieSetInteger(char *name, int value,
 	int secondsToLive, char *path, char *domain);
 extern void cgiHeaderLocation(char *redirectUrl);
