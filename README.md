@@ -1,9 +1,5 @@
-<html>
-<head>
-<title>cgic: an ANSI C library for CGI Programming</title>
-</head>
-<body>
 <h1>cgic 2.07: an ANSI C library for CGI Programming</h1>
+<h2>By <a href="http://boutell.dev">Thomas Boutell</a></h2>
 <blockquote>
 <strong>IMPORTANT NOTICES:</strong>
 <p>
@@ -193,6 +189,10 @@ Version 1.02 corrects bugs in previous versions:
 <a href="#cgiFormDoubleBounded">cgiFormDoubleBounded</a> specified
 its arguments in the wrong order, with surprising results.
 This bug has been corrected.
+<li>
+Many small changes have been made to increase compatibility.
+cgic now compiles with no warnings under the compilers
+available at boutell.dev.
 </ul>
 <h3><a name="whatsnew101">What's new in version 1.01?</a></h3>
 Version 1.01 adds no major functionality but corrects 
@@ -279,6 +279,34 @@ Remember, the computer on your desk is usually NOT your web server.
 Compiling a Windows console executable will not give you a CGI program that
 can be installed on a Linux-based server. 
 </blockquote>
+Your web browser should inquire whether to save the file to disk
+when you select one of the links below. Under Unix and compatible
+operating systems, save it, then issue the following
+commands to unpack it:
+<pre>
+gunzip cgic207.tar.gz
+tar -xf cgic207.tar
+</pre>
+This should produce the subdirectory 'cgic207', which will contain
+the complete cgic distribution for version 2.07, including a copy of this 
+documentation in the file cgic.html.
+<p>
+Under Windows and compatible operating systems, save it,
+open a command prompt window, and issue the following commands to unpack it:
+<pre>
+unzip /d cgic207.zip
+</pre>
+Or use the unzip utility of your choice.
+<p>
+This command also produces the subdirectory 'cgic207', which will contain
+the complete cgic distribution, including a copy of this 
+documentation in the file cgic.html.
+<p>
+cgic is available via the web from www.boutell.dev:
+<ul>
+<li><a href="http://www.boutell.dev/cgic/cgic207.tar.gz">Obtain cgic: gzipped tar file</a>
+<li><a href="http://www.boutell.dev/cgic/cgic207.zip">Obtain cgic: .ZIP file</a>
+</ul>
 <h3><a name="build">Building cgic: a sample application</a></h3>
 The sample application 'cgictest.c' is provided as part of the
 cgic distribution. This CGI program displays an input form, 
@@ -1147,7 +1175,8 @@ variable containing the name of the browser software is
 <a href="#cgiUserAgent">cgiUserAgent</a>. The referring URL appears
 in the variable <a href="#cgiReferrer">cgiReferrer</a>.
 <h3><a name="images">How can I generate images from my cgic application?</a></h3>
-cgic can be used in conjunction with the <a href="https://libgd.github.io/">gd graphics library</a>, which
+cgic can be used in conjunction with the
+<a href="https://libgd.github.io/">gd graphics library</a>, which
 can produce GIF images on the fly.
 <p>
 The following short sample program hints at the possibilities:
@@ -2055,5 +2084,3 @@ produced by a pre-2.0 version of CGIC was made.
 <a href="#cgiStringArrayFree">cgiStringArrayFree()</a> |
 <a href="#cgiUserAgent">cgiUserAgent</a> |
 <a href="#cgiWriteEnvironment">cgiWriteEnvironment()</a>
-</body>
-</html>
