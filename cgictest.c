@@ -4,7 +4,7 @@
 #define SERVER_NAME cgiServerName
 #endif
 #if 0
-#define SERVER_NAME "www.boutell.com"
+#define SERVER_NAME "www.boutell.dev"
 #endif
 
 /* You may need to change this, particularly under Windows;
