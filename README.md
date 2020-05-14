@@ -1,4 +1,4 @@
-<h1>cgic 2.07: an ANSI C library for CGI Programming</h1>
+<h1>cgic 2.08: an ANSI C library for CGI Programming</h1>
 <h2>By <a href="http://boutell.dev">Thomas Boutell</a></h2>
 <blockquote>
 <strong>IMPORTANT NOTICES:</strong>
@@ -13,7 +13,7 @@ important security fixes.
 <h3>Table of Contents</h3>
 <ul>
 <li><a href="#credits">Credits and license terms</a>
-<li><a href="#whatsnew205">What's new in version XYZ of CGIC?</a>
+<li><a href="#whatsnew208">What's new in version XYZ of CGIC?</a>
 <li><a href="#whatis">What is cgic?</a>
 <li><a href="#obtain">Obtaining cgic</a>
 <li><a href="#build">Building and testing cgic: a sample application</a>
@@ -33,7 +33,7 @@ important security fixes.
 cgic is now distributed under the MIT license:
 </p>
 <p>
-Copyright (c) 1996-2019 Thomas Boutell
+Copyright (c) 1996-2020 Thomas Boutell
 </p>
 <p>
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -52,6 +52,18 @@ of multipart/form-data file upload support in CGIC 2.x is my own,
 I particularly wish to thank those who submitted their own 
 implementations of this feature.
 </p>
+<h3><a name="whatsnew208">What's new in version 2.08?</a></h3>
+Beginning with version 2.08, `cgic` offers more options when setting cookies. To enhance security, the following options can be used when setting a cookie:
+<ul>
+<li>Secure</li>
+<li>HttpOnly</li>
+<li>SameSite=Strict</li>
+</ul>
+The new function
+<code><a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a></code>
+allows you to set these options. The function
+<code><a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a></code>
+is kept for compability reasons.
 <h3><a name="whatsnew207">What's new in version 2.07?</a></h3>
 Per a suggestion by Geoff Mulligan, cgic now tolerates keys without a value in URL-encoded GET and POST submissions. Although the HTML5 spec discourages it, there are existing systems in the wild that do leave the `=` off entirely if the value is an empty string. Beginning with version 2.07, `cgic` handles this as you'd expect: you get an entry with the corresponding key and an empty string as the value. A simple unit test compilation target was also added, to test this feature and rule out side effects.
 <h3><a name="whatsnew206">What's new in version 2.06?</a></h3>
@@ -443,8 +455,9 @@ void CookieSet()
       browser chooses to get rid of it, which 
       may be immediately), and applies only to 
       this script on this site. */  
-    cgiHeaderCookieSetString(cname, cvalue,
-      86400, cgiScriptName, cgiServerName);
+    cgiHeaderCookieSet(cname, cvalue,
+      86400, cgiScriptName, cgiServerName,
+      cgiCookieHttpOnly | cgiCookieSameSiteStrict);
   }
 }
 </pre>
@@ -454,7 +467,7 @@ in by the user. Normally, cookie names and values are chosen to meet the
 needs of the programmer and provide a means of identifying the same
 user again later.
 <p>
-The <a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a>
+The <a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a>
 function sets the cookie by requesting that the web browser store it.
 <strong>There is never any guarantee that this will happen!</strong>
 Many browsers reject cookies completely; others do not necessarily keep
@@ -479,6 +492,9 @@ to a single web site or to an entire domain, such as
 domain. In this case, the current site on which the program is running
 is the only relevant site, so <code><a href="#cgiServerName">cgiServerName</a></code> is used
 as the domain.
+<p>
+The sixth argument sets extra security options, for example <i>HttpOnly</i> or
+<i>SameSite=Strict</i> to prevent cross-site-scripting attacks.
 <h4>Outputting the Content Type Header</h4>
 Next, <a href="#cgiHeaderContentType">cgiHeaderContentType()</a> is 
 called to indicate the MIME type of the document being output, in this case 
@@ -1564,7 +1580,7 @@ cgiFormResultType cgiFormRadio(
   this function returns retrieve the content name claimed by the
   user for the specified form input field of type <code>file</code>. 
   On success, this function sets *cfpp to a valid cgiFilePtr
-  object for use with <a href="#cgiFormFileRead</a>cgiFormFileRead</a>
+  object for use with <a href="#cgiFormFileRead">cgiFormFileRead</a>
   and returns <a href="#cgiFormSuccess">cgiFormSuccess</a>.
   On failure, this function sets *cfpp to a null pointer, and
   returns <a href="#cgiFormNotFound">cgiFormNotFound</a>,
@@ -1611,7 +1627,7 @@ is needed in this case.
 <p>
 If you wish to set cookies,
 <strong>you must make your calls to 
-<a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a>
+<a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a>
 and 
 <a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>
 </strong> BEFORE invoking cgiHeaderLocation. 
@@ -1625,7 +1641,7 @@ message to be displayed to the user.
 <p>
 If you wish to set cookies,
 <strong>you must make your calls to 
-<a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a>
+<a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a>
 and 
 <a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>
 </strong> BEFORE invoking cgiHeaderStatus.
@@ -1641,15 +1657,15 @@ a GIF image and "audio/basic" for .au-format audio.
 <p>
 If you wish to set cookies,
 <strong>you must make your calls to 
-<a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a>
+<a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a>
 and 
 <a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>
 </strong> BEFORE invoking cgiHeaderContentType.
-<br><br><dt><strong><a name="cgiHeaderCookieSetString">
-void cgiHeaderCookieSetString(char *name, char *value,
-  int secondsToLive, char *path, char *domain)</a>
+<br><br><dt><strong><a name="cgiHeaderCookieSet">
+void cgiHeaderCookieSet(char *name, char *value,
+  int secondsToLive, char *path, char *domain, int options)</a>
 </strong><br><dd>
-cgiHeaderCookieSetString() should be called when the programmer wishes
+cgiHeaderCookieSet() should be called when the programmer wishes
 to store a piece of information in the user's browser, so that the
 stored information is again presented to the server on subsequent
 accesses to the relevant site. The first argument is the name of the
@@ -1669,13 +1685,31 @@ set this argument to <code>/</code>. The final argument is the
 web site name or entire domain for which this cookie should be
 submitted; if you choose to have the cookie sent back for an
 entire domain, this argument must begin with a dot, such as
-<code>.boutell.dev</code>. The cgic variables <a name="#cgiScriptName</a>
+<code>.boutell.dev</code>. The cgic variables <a name="#cgiScriptName">cgiScriptName</a>
 and <a name="#cgiServerName">cgiServerName</a> are convenient
 values for the fourth and fifth arguments.
-See also <a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>,
+The sixth argument is a bitmask for specifying cookie security options.
+It can be zero (no options) or a bitwise-OR of the following
+<code>enum cgiCookieOption</code> values:
+<ul>
+<li><code>cgiCookieSecure</code></li>
+<li><code>cgiCookieHttpOnly</code></li>
+<li><code>cgiCookieSameSiteStrict</code></li>
+</ul>
+See <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies">HTTP cookies</a>
+for more information.<br>
+See also <a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a>,
+<a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>,
 <a href="#cgiCookieString">cgiCookieString</a>, 
-<a href="#cgiCookieString">cgiCookieInteger</a> and
+<a href="#cgiCookieInteger">cgiCookieInteger</a> and
 <a href="#cgiCookies">cgiCookies</a>.
+<br><br><dt><strong><a name="cgiHeaderCookieSetString">
+void cgiHeaderCookieSetString(char *name, char *value,
+  int secondsToLive, char *path, char *domain)</a>
+</strong><br><dd>
+cgiHeaderCookieSetString() is kept for API compability reasons. It calls
+<a href"#cgiHeaderCookieSet()">cgiHeaderCookieSet</a> with zero (0) as sixth
+argument, i.e. no cookie options are set.
 <br><br><dt><strong><a name="cgiHeaderCookieSetInteger">
 void cgiHeaderCookieSetInteger(char *name, int value,
   int secondsToLive, char *path, char *domain)</a>
@@ -1704,10 +1738,6 @@ for complete information.
   an empty string is copied to result. 
 <br><br><dt><strong><a name="cgiCookieInteger">cgiFormResultType cgiCookieInteger(
   char *name, int *result, int defaultV)</a>
-  See also <a href="#cgiCookieString">cgiCookieInteger</a>,
-  <a href="#cgiCookies">cgiCookies</a>,
-  <a href="#cgiHeaderCookieSetString>cgiHeaderCookieSetString</a>, and
-  <a href="#cgiHeaderCookieSetInteger>cgiHeaderCookieSetInteger</a>.
 </strong><br><dd>cgiCookieInteger() attempts to retrieve the integer sent for the
   specified cookie (browser-side persistent storage). The value 
   pointed to by result will be set to the value submitted. 
@@ -1717,11 +1747,12 @@ for complete information.
   cgiFormBadType if the value submitted is not an integer,
   and <a href="#cgiFormNotFound">cgiFormNotFound</a> if no such 
   input field was submitted. In the last three cases, the value 
-  pointed to by result is set to the specified default.
+  pointed to by result is set to the specified default.<br>
   See also <a href="#cgiCookieString">cgiCookieString</a>,
   <a href="#cgiCookies">cgiCookies</a>,
-  <a href="#cgiHeaderCookieSetString>cgiHeaderCookieSetString</a>, and
-  <a href="#cgiHeaderCookieSetInteger>cgiHeaderCookieSetInteger</a>.
+  <a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a>,
+  <a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a>, and
+  <a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a>.
 <br><br><dt><strong><a name="cgiCookies">cgiFormResultType cgiCookies(
   char *name, char ***ptrToStringArray)</a>
 </strong><br><dd>cgiCookies is useful when the programmer cannot know the names
@@ -2021,9 +2052,11 @@ produced by a pre-2.0 version of CGIC was made.
 <a href="#cgiEnvironmentSuccess">cgiEnvironmentSuccess</a> |
 <a href="#cgiCookieInteger">cgiCookieInteger</a> |
 <a href="#cgiCookies">cgiCookies</a> |
-<a href="#cgiCookieSetInteger">cgiCookieSetInteger</a> |
-<a href="#cgiCookieSetString">cgiCookieSetString</a> |
+<a href="#cgiHeaderCookieSet">cgiHeaderCookieSet</a> |
+<a href="#cgiHeaderCookieSetString">cgiHeaderCookieSetString</a> |
+<a href="#cgiHeaderCookieSetInteger">cgiHeaderCookieSetInteger</a> |
 <a href="#cgiCookieString">cgiCookieString</a> |
+<a href="#cgiCookieInteger">cgiCookieInteger</a> |
 <a href="#cgiHtmlEscape">cgiHtmlEscape</a> |
 <a href="#cgiHtmlEscapeData">cgiHtmlEscapeData</a> |
 <a href="#cgiValueEscape">cgiValueEscape</a> |
@@ -2045,10 +2078,10 @@ produced by a pre-2.0 version of CGIC was made.
 <a href="#cgiFormFileSize">cgiFormFileSize</a> |
 <a href="#cgiFormInteger">cgiFormInteger()</a> |
 <a href="#cgiFormIntegerBounded">cgiFormIntegerBounded()</a> |
-<a href="#cgiFormNoContentType>cgiFormNoContentType</a> |
-<a href="#cgiFormNoFileName>cgiFormNoFileName</a> |
+<a href="#cgiFormNoContentType">cgiFormNoContentType</a> |
+<a href="#cgiFormNoFileName">cgiFormNoFileName</a> |
 <a href="#cgiFormNoSuchChoice">cgiFormNoSuchChoice</a> |
-<a href="#cgiFormNotAFile>cgiFormNotAFile</a> |
+<a href="#cgiFormNotAFile">cgiFormNotAFile</a> |
 <a href="#cgiFormNotFound">cgiFormNotFound</a> |
 <a href="#cgiFormRadio">cgiFormRadio()</a> |
 <a href="#cgiFormSelectMultiple">cgiFormSelectMultiple()</a> |
