@@ -210,7 +210,7 @@ typedef enum {
 extern cgiEnvironmentResultType cgiWriteEnvironment(char *filename);
 extern cgiEnvironmentResultType cgiReadEnvironment(char *filename);
 
-extern int cgiMain();
+extern int cgiMain(void);
 
 extern cgiFormResultType cgiFormEntries(
 	char ***ptrToStringArray);
