@@ -298,6 +298,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 #else
 	result = cgiMain();
+	cgiFreeResources();
 	return result;
 #endif
 }
