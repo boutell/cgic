@@ -17,6 +17,7 @@ important security fixes.
 <li><a href="#whatis">What is cgic?</a>
 <li><a href="#obtain">Obtaining cgic</a>
 <li><a href="#build">Building and testing cgic: a sample application</a>
+<li><a href="#tempfiles">Temporary files and upload size limit</a>
 <li><a href="#nocompile">What to do if it won't compile</a>
 <li><a href="#howto">How to write a cgic application</a>
 <li><a href="#images">How can I generate images from my cgic application?</a>
@@ -357,6 +358,28 @@ If all goes well, cgictest.cgi will respond with a page which
 indicates the various settings you submitted. If not,
 please reread the section above regarding the correct location in
 which to install your CGI program on your web server.
+<h3><a name="tempfiles">Temporary files and upload size limit</a></h3>
+By default, cgic keeps uploaded files in temporary files in
+<code>/tmp</code>, and refuses any uploaded file (or other
+<code>multipart/form-data</code> field) larger than 1 GB
+(1073741824 bytes). When it does, cgic responds with a 500 error
+and your <code>cgiMain()</code> function is not called.
+<p>
+You can change both settings without editing cgic.c, by defining
+<code>cgicTempDir</code> and <code>cgicMaxTempSize</code> when you
+compile it. For instance, to keep temporary files in
+<code>/var/tmp</code> and refuse uploads larger than 100 MB,
+change the <code>CFLAGS</code> line of the Makefile to:
+<pre>
+CFLAGS=-g -Wall -DcgicTempDir='"/var/tmp"' -DcgicMaxTempSize=104857600
+</pre>
+Then type 'make clean' and 'make' to rebuild. If you do not use the
+Makefile, give the same options to your compiler when it compiles cgic.c.
+<p>
+Note that <code>cgicTempDir</code> must be a quoted string, as shown
+above. <code>cgicMaxTempSize</code> is in bytes. <code>cgicTempDir</code>
+is used only under Unix; under Windows, temporary files go where the
+<code>tmpnam()</code> function suggests.
 <h3><a name="nocompile">What to do if it won't compile</a></h3>
 <ul>
 <li><strong>Are you using Visual C++ or Borland C++? Did you forget to add
